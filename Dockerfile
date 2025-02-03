@@ -17,7 +17,7 @@ WORKDIR /app
 
 # Copy scripts into the container
 COPY deduplicate.py /app/deduplicate.py
-COPY phash.pl /app/phash.pl
+COPY /bin/phash.pl /app/phash.pl
 
 # Ensure /images directory exists
 RUN mkdir -p /images
