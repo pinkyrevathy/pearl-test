@@ -42,6 +42,18 @@ def find_and_remove_duplicates(image_dir):
         else:
             phash_dict[phash] = image_path  # Store first occurrence
 
-if __name__ == "__main__":
-    IMAGE_DIRECTORY = "/images"  # Change this to your image directory
-    find_and_remove_duplicates(IMAGE_DIRECTORY)
+    # If duplicates were found and moved, commit changes
+    if changes_made:
+        commit_and_push_changes()
+
+def commit_and_push_changes():
+    print("Committing and pushing changes...")
+    try:
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", "Remove duplicate images [Automated]"], check=True)
+        subprocess.run(["git", "push"], check=True)
+    except Exception as e:
+        print(f"Error while committing changes: {e}")
+
+# Run deduplication for all folders under 'images'
+find_and_cut_duplicates("images")
