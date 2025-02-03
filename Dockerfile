@@ -17,10 +17,19 @@ WORKDIR /app
 
 # Copy scripts into the container
 COPY deduplicate.py /app/deduplicate.py
-COPY /bin/phash.pl /app/phash.pl
+COPY bin/phash.pl /app/bin/phash.pl
+
+# Ensure phash.pl is executable
+RUN chmod +x /app/bin/phash.pl
 
 # Ensure /images directory exists
 RUN mkdir -p /images
+
+# Initialize Git repo in container
+RUN git init /images && \
+    cd /images && \
+    git config --global user.email "pinkyrevathy@gmail.com" && \
+    git config --global user.name "GitHub Actions"
 
 # Set a volume for images
 VOLUME ["/images"]

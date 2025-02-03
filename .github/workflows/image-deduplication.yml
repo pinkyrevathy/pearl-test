@@ -42,6 +42,7 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "pinkyrevathy@gmail.com"
           git add images/
+          git status  # Debugging step to check what Git sees
           if git diff --staged --quiet; then
             echo "✅ No changes to commit."
           else
