@@ -11,8 +11,8 @@ def get_phash(image_path):
         print(f"❌ Error processing {image_path}: {e}")
         return None  # Return None so we skip failed images
 
-def find_and_remove_duplicates(image_dir):
-    """Find and move duplicate images into separate 'duplicates' folders inside each team folder."""
+def find_and_move_duplicates(image_dir):
+    """Move duplicate images into 'duplicates/' folder while keeping originals in place."""
     
     if not os.path.exists(image_dir):
         print(f"⚠️ Directory '{image_dir}' does not exist. Creating it now...")
@@ -20,6 +20,7 @@ def find_and_remove_duplicates(image_dir):
         return  # Exit function if no images exist
 
     phash_dict = {}  # Stores {phash: first_seen_image_path}
+    duplicates_moved = False  # Flag to check if duplicates were moved
 
     for team_folder in os.listdir(image_dir):
         team_path = os.path.join(image_dir, team_folder)
@@ -32,8 +33,8 @@ def find_and_remove_duplicates(image_dir):
         for filename in os.listdir(team_path):
             image_path = os.path.join(team_path, filename)
 
-            if not os.path.isfile(image_path):
-                continue  # Skip non-files
+            if not os.path.isfile(image_path) or filename.lower() == "duplicates":
+                continue  # Skip non-files and already existing duplicates folder
 
             phash = get_phash(image_path)
             if phash is None:
@@ -42,12 +43,22 @@ def find_and_remove_duplicates(image_dir):
 
             if phash in phash_dict:
                 duplicate_path = os.path.join(duplicates_folder, filename)
+                
+                # Prevent overwriting if a duplicate file exists
+                counter = 1
+                while os.path.exists(duplicate_path):
+                    name, ext = os.path.splitext(filename)
+                    duplicate_path = os.path.join(duplicates_folder, f"{name}_{counter}{ext}")
+                    counter += 1
+
                 print(f"🛠 Moving duplicate: {image_path} → {duplicate_path}")
                 shutil.move(image_path, duplicate_path)  # Move duplicate image
+                duplicates_moved = True  # Set flag to indicate a change
             else:
                 phash_dict[phash] = image_path  # Store first occurrence
 
-    commit_and_push_changes(image_dir)
+    if duplicates_moved:
+        commit_and_push_changes(image_dir)
 
 def commit_and_push_changes(image_dir):
     """Commit and push duplicate images to GitHub."""
@@ -71,4 +82,4 @@ def commit_and_push_changes(image_dir):
 
 if __name__ == "__main__":
     IMAGE_DIRECTORY = "/images"
-    find_and_remove_duplicates(IMAGE_DIRECTORY)
+    find_and_move_duplicates(IMAGE_DIRECTORY)
