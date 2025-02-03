@@ -5,7 +5,7 @@ import shutil
 def get_phash(image_path):
     """Compute perceptual hash (pHash) for an image using the Perl script."""
     try:
-        result = subprocess.run(["perl", "/app/phash.pl", image_path], capture_output=True, text=True, check=True)
+        result = subprocess.run(["perl", "/bin/phash.pl", image_path], capture_output=True, text=True, check=True)
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
         print(f"❌ Error processing {image_path}: {e}")
