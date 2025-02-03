@@ -1,0 +1,38 @@
+name: Image Deduplication
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  remove-duplicates:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Allow GITHUB_TOKEN to commit changes
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install pillow imagehash
+
+      - name: Run Deduplication Script
+        run: python deduplicate.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@users.noreply.github.com"
+          git add .
+          git commit -m "Remove duplicate images [Automated]"
+          git push
