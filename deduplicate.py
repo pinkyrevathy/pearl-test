@@ -13,9 +13,12 @@ def get_phash(image_path):
 
 def find_and_remove_duplicates(image_dir):
     """Find and move duplicate images to a 'duplicates' folder."""
+    
+    # ✅ Ensure the images directory exists
     if not os.path.exists(image_dir):
-        print(f"❌ Error: Directory '{image_dir}' does not exist.")
-        return
+        print(f"⚠️ Directory '{image_dir}' does not exist. Creating it now...")
+        os.makedirs(image_dir, exist_ok=True)
+        return  # Exit the function since no images are available
 
     duplicates_folder = os.path.join(image_dir, "duplicates")
     os.makedirs(duplicates_folder, exist_ok=True)  # Ensure duplicate directory exists
