@@ -31,8 +31,8 @@ jobs:
 
       - name: Commit and Push Changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions@users.noreply.github.com"
+          git config --global user.name "vineetha"
+          git config --global user.email "pinkyrevathy@gmail.com"
           git add .
           git commit -m "Remove duplicate images [Automated]"
           git push
