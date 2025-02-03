@@ -12,14 +12,13 @@ def get_phash(image_path):
         return None  # Return None so we skip failed images
 
 def find_and_move_duplicates(image_dir):
-    """Move duplicate images into 'duplicates/' folder while keeping originals in place."""
+    """Keep distinct images in each team folder, move duplicates to 'duplicates/' inside the same team folder."""
     
     if not os.path.exists(image_dir):
         print(f"⚠️ Directory '{image_dir}' does not exist. Creating it now...")
         os.makedirs(image_dir, exist_ok=True)
         return  # Exit function if no images exist
 
-    phash_dict = {}  # Stores {phash: first_seen_image_path}
     duplicates_moved = False  # Flag to check if duplicates were moved
 
     for team_folder in os.listdir(image_dir):
@@ -29,6 +28,8 @@ def find_and_move_duplicates(image_dir):
         
         duplicates_folder = os.path.join(team_path, "duplicates")
         os.makedirs(duplicates_folder, exist_ok=True)  # Ensure duplicate directory exists
+
+        phash_dict = {}  # Stores {phash: first_seen_image_path}
 
         for filename in os.listdir(team_path):
             image_path = os.path.join(team_path, filename)
@@ -43,7 +44,7 @@ def find_and_move_duplicates(image_dir):
 
             if phash in phash_dict:
                 duplicate_path = os.path.join(duplicates_folder, filename)
-                
+
                 # Prevent overwriting if a duplicate file exists
                 counter = 1
                 while os.path.exists(duplicate_path):
