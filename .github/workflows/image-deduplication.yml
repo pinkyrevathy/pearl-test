@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
   remove-duplicates:
@@ -24,15 +25,26 @@ jobs:
           python-version: '3.9'
 
       - name: Install Dependencies
-        run: pip install pillow imagehash
+        run: pip install pillow
 
-      - name: Run Deduplication Script
-        run: python deduplicate.py
+      - name: Ensure /images Directory Exists
+        run: mkdir -p ${{ github.workspace }}/images
 
-      - name: Commit and Push Changes
+      - name: Build and Run Docker
         run: |
-          git config --global user.name "vineetha"
+          docker build -t image-deduplication .
+          docker run --rm -v ${{ github.workspace }}/images:/images image-deduplication
+
+      - name: Commit and Push Changes if Any
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "GitHub Actions"
           git config --global user.email "pinkyrevathy@gmail.com"
-          git add .
-          git commit -m "Remove duplicate images [Automated]"
-          git push
+          git add images/
+          if git diff --staged --quiet; then
+            echo "✅ No changes to commit."
+          else
+            git commit -m "Moved duplicate images [Automated]"
+            git push origin HEAD
+          fi
